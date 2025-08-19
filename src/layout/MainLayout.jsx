@@ -1,14 +1,17 @@
-import Navbar from "@/components/Navbar"
-import {ToastContainer} from "react-toastify"
-import "react-toastify/dist/ReactToastify.css"
+import Navbar from "@/components/Navbar";
+import { MainContextProvider } from "@/context/MainContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const MainLayout = ({children}) => {
+const MainLayout = ({ children }) => {
   return (
     <>
+      <MainContextProvider>
         <ToastContainer />
-        <Navbar/>
+        <Navbar />
         {children}
+      </MainContextProvider>
     </>
-  )
-}
-export default MainLayout
+  );
+};
+export default MainLayout;

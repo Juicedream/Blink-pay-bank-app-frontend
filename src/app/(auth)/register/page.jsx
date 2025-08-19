@@ -1,5 +1,6 @@
 "use client";
 import CustomAuthButton from "@/components/resusable/CustomAuthButton";
+import { useMainContext } from "@/context/MainContext";
 import { axiosClient } from "@/utils/AxiosClient";
 
 import { Formik, Form, ErrorMessage, Field } from "formik";
@@ -10,6 +11,7 @@ import * as yup from "yup";
 const accountTypes = ["Savings", "Current"];
 const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
+  const {fetchUserProfile} = useMainContext()
   const initialValues = {
     name: "",
     email: "",
@@ -37,11 +39,14 @@ const RegisterPage = () => {
     setLoading(true)
     try {
       const response = await axiosClient.post("/auth/register", values);
-      const data = await response.data;
-
-      console.log(data);
+      const data = response.data;
       toast.success(data.msg);
+      //token
+      localStorage.setItem("token", data.token);
+      await fetchUserProfile()
+
       helpers.resetForm();
+
     } catch (error) {
       toast.error(error.response.data.msg);
       console.log(error);

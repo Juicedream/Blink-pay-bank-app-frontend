@@ -7,9 +7,14 @@ import { Formik, Form, ErrorMessage, Field } from "formik";
 import { toast } from "react-toastify";
 import * as yup from "yup";
 import Link from "next/link";
+import { useMainContext } from "@/context/MainContext";
+import { useRouter } from "next/navigation";
+
 
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
+  const {fetchUserProfile} = useMainContext();
+  const router = useRouter();
 
   const initialValues = {
     email: "",
@@ -26,14 +31,17 @@ const LoginPage = () => {
 
  
   const onSubmitHandler = async (values, helpers) => {
-    setLoading(true)
     try {
+      setLoading(true)
       const response = await axiosClient.post("/auth/login", values);
-      const data = await response.data;
-
-      console.log(data);
-      helpers.resetForm();
+      const data = response.data;
       toast.success(data.msg);
+      // //token
+      localStorage.setItem("token", data.token);
+      await fetchUserProfile()
+      router.push("/")
+
+      helpers.resetForm();
     } catch (error) {
       toast.error(error.response.data.msg);
       console.log(error.message);
