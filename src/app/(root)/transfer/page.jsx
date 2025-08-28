@@ -36,7 +36,10 @@ const transferPage = () => {
         amount: "",
         narration: "",
       });
-      setLoading(false);
+      // setLoading(false);
+       setTimeout(() => {
+         window.location.reload();
+       }, 1000);
     } catch (error) {
       setLoading(false);
       console.log(error);

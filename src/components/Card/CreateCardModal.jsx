@@ -40,7 +40,6 @@ export default function MyModal() {
         return;
       }
       console.log(form);
-        console.log("Bearer Token:", token);
 
       //send to create card
 
@@ -58,7 +57,7 @@ export default function MyModal() {
 
       setTimeout(() => {
          window.location.reload();
-      }, 2000)
+      }, 2000);
     //   setIsLoading(false);
     //   setForm({
     //     card_name: "",
