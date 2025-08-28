@@ -15,19 +15,19 @@ const HomePage = () => {
       color: "text-green-500",
       link: "/amount"
     },
+    // {
+    //   title: "FD Amount",
+    //   icon: RiCoinsLine,
+    //   value: 8765291.9,
+    //   color: "text-yellow-500",
+    //   link: "/fd-amount"
+    // },
     {
-      title: "FD Amount",
-      icon: RiCoinsLine,
-      value: 8765291.9,
-      color: "text-yellow-500",
-      link: "/fd-amount"
-    },
-    {
-      title: "Atm Cards",
+      title: "Cards",
       icon: FaCreditCard,
-      value: 12,
-      color: "text-green-500",
-      link: "/atm-cards"
+      value: user?.card === null ? 0 : 1,
+      color: "text-purple-500",
+      link: "/card"
     },
   ];
  
@@ -54,7 +54,7 @@ const DashboardCard = ({data}) => {
     <div className="flex flex-col gap-y-2 justify-end">
       <p className="text-3xl font-semibold">{data.title.toUpperCase()}</p>
       <h3 className="text-4xl font-bold text-end">
-      {data.title !== "Atm Cards" ? `₦ ${data.value.toLocaleString()}` : data.value}  
+      {data.title !== "Cards" ? `₦ ${data.value.toLocaleString()}` : data.value}  
       </h3> 
     </div>
   </Link>;

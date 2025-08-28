@@ -12,6 +12,7 @@ import { GiFalloutShelter } from "react-icons/gi";
 import { GrCurrency } from "react-icons/gr";
 import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { RiHistoryFill } from "react-icons/ri";
+import { BsCreditCardFill } from "react-icons/bs";
 
 
 const RootTemplate = ({ children }) => {
@@ -62,7 +63,7 @@ const RootTemplate = ({ children }) => {
       >
         <Menu className="!bg-white !min-h-screen lg:!min-h-[90vh] px-3 py-10">
           <CustomMenu link="/" text="Home" Icon={MdDashboard} />
-          <CustomMenu link="/amount" text="Amount" Icon={GrCurrency} />
+          {/* <CustomMenu link="/amount" text="Amount" Icon={GrCurrency} /> */}
           <CustomMenu
             link="/transfer"
             text="Transfer Money"
@@ -72,6 +73,11 @@ const RootTemplate = ({ children }) => {
             link="/transaction-history"
             text="Transaction History"
             Icon={RiHistoryFill}
+          />
+          <CustomMenu
+            link="/card"
+            text="Card"
+            Icon={BsCreditCardFill}
           />
           <CustomMenu link="/profile" text="Profile" Icon={GiFalloutShelter} />
         </Menu>
