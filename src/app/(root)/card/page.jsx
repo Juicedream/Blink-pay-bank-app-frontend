@@ -6,11 +6,11 @@ import CreditCard from "@/components/Card/CreditCard";
 import { useEffect, useState } from "react";
 import { axiosClient } from "@/utils/AxiosClient";
 const bgColor = {
-  regular: "bg-purple-900",
-  vintage: "bg-amber-900",
-  platinum: "bg-yellow-600",
-  women: "bg-pink-900",
-  "": "bg-black",
+  regular: "hover:bg-purple-900",
+  vintage: "hover:bg-amber-900",
+  platinum: "hover:bg-yellow-600",
+  women: "hover:bg-pink-900",
+  "": "hover:bg-black",
 };
 const textColor = {
   regular: "text-purple-900",
@@ -78,7 +78,7 @@ const CardPage = () => {
                       borderColor[user?.card.card_type]
                     } px-2 ${
                       textColor[user?.card.card_type]
-                    } rounded-md cursor-pointer hover:${
+                    } rounded-md cursor-pointer ${
                       bgColor[user?.card.card_type]
                     } hover:text-white`}
                   >
