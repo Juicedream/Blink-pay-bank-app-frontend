@@ -36,7 +36,7 @@ const LoginPage = () => {
       const response = await axiosClient.post("/auth/login", values);
       const data = response.data;
       toast.success(data.msg);
-      // //token
+
       localStorage.setItem("token", data.token);
       await fetchUserProfile()
       router.push("/")

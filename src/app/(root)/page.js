@@ -2,10 +2,12 @@
 import HeaderName from "@/components/HeaderName";
 import { useMainContext } from "@/context/MainContext";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import {  FaMoneyBill, FaCreditCard } from "react-icons/fa6";
 import {  RiCoinsLine } from "react-icons/ri";
 const HomePage = () => {
   const { user } = useMainContext();
+
   console.log(user.acc_balance);
   const dashboardData = [
     {
