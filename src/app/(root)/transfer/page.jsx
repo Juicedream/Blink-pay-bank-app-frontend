@@ -10,12 +10,14 @@ const transferPage = () => {
   const { user } = useMainContext();
   const token = localStorage.getItem("token");
   const [loading, setLoading] = useState(false);
+  const [accountName, setAccountName] = useState("");
   const [transferBody, setTransferBody] = useState({
     receiver_acc_number: "",
     sender_pin: "",
     amount: "",
     narration: "",
   });
+
   async function showPop() {
     setLoading(true);
     try {
@@ -36,10 +38,10 @@ const transferPage = () => {
         amount: "",
         narration: "",
       });
-      // setLoading(false);
-       setTimeout(() => {
-         window.location.reload();
-       }, 1000);
+      setLoading(false);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       setLoading(false);
       console.log(error);
@@ -47,6 +49,71 @@ const transferPage = () => {
     }
   }
 
+  async function showAccountName() {
+    console.log("Fetching account name...");
+    toast.info("Fetching account name...");
+    try {
+      const response = await axiosClient.get(
+        "/account/show-account-info/" + transferBody.receiver_acc_number,
+
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = response.data;
+      console.log(data);
+      toast.success(data.msg);
+      setAccountName(data.account_info?.name);
+    } catch (error) {
+      console.log(error.response.data.msg);
+      toast.error(error.response.data.msg);
+      setAccountName("");
+    }
+  }
+
+   useEffect(() => {
+      const websocket = new WebSocket(
+        "wss://blink-pay-bank-app-backend.onrender.com"
+      );
+  
+      websocket.onopen = () => {
+        console.log("WebSocket connection established");
+      };
+  
+      websocket.onmessage = (event) => {
+        const { event: evt, data } = JSON.parse(event.data);
+        if (evt === "money_received") {
+         if(data?.transaction?.receiver_acc_number === user?.user?.acc_number){
+          //  setShowToast(data);
+          console.log("Money received", {
+            data,
+            amount: data?.transaction.amount,
+          });
+          toast.success(data?.transaction?.sender_name + " just credited your account with " + `₦${data?.transaction?.amount.toLocaleString()}`);
+        }
+      };
+    }
+  
+      // websocket.onclose = () => {
+      //   console.log("Disconnected ❌");
+      // };
+  
+      // websocket.onerror = (error) => {
+      //   console.error("WebSocket error:", error);
+      // };
+  
+      // ✅ cleanup so double-mount won’t leave ghost sockets
+      return () => {
+      if (websocket) {
+        console.log("🔒 Closing WebSocket safely...");
+        websocket.close();
+      }
+      
+        
+    };
+    }, [])
   useEffect(() => {
     if (transferBody.amount > user?.user.acc_balance) {
       toast.error(
@@ -54,6 +121,16 @@ const transferPage = () => {
       );
     }
   }, [transferBody.amount]);
+
+  useEffect(() => {
+    if (transferBody.receiver_acc_number?.toString().length === 10) {
+      console.log("Valid account number");
+      showAccountName();
+      return;
+    }else{
+      setAccountName("");
+    }
+  }, [transferBody.receiver_acc_number,]);
 
   return (
     <>
@@ -85,6 +162,9 @@ const transferPage = () => {
             }
             type="text"
           />
+          <p className="text-green-600 border-yellow-500 border-1" disabled>
+            {accountName && accountName}
+          </p>
           <input
             placeholder="Amount to send"
             className="subscribe-input"
