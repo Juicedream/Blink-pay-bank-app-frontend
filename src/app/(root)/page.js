@@ -48,7 +48,7 @@ const HomePage = () => {
     websocket.onmessage = (event) => {
       const { event: evt, data } = JSON.parse(event.data);
       if (evt === "money_received") {
-       if(data?.transaction?.receiver_acc_number !== user?.user?.acc_number){
+       if(data?.transaction?.receiver_acc_number === user?.user?.acc_number){
          setShowToast(data);
         console.log("Money received", {
           data,
