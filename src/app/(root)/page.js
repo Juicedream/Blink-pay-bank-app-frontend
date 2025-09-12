@@ -47,17 +47,64 @@ const HomePage = () => {
 
     websocket.onmessage = (event) => {
       const { event: evt, data } = JSON.parse(event.data);
-      if (evt === "money_received") {
-       if(data?.transaction?.receiver_acc_number === user?.user?.acc_number){
-         setShowToast(data);
-        console.log("Money received", {
-          data,
-          amount: data?.transaction.amount,
-        });
-        toast.success(data?.transaction?.sender_name + " just credited your account with " + `₦${data?.transaction?.amount.toLocaleString()}`);
+      // your are the receiver
+      if (data?.transaction?.receiver_id === user?.user?.userId) {
+        if (evt === "money_received") {
+          //  setShowToast(data);
+          console.log("Money received", {
+            data,
+            amount: data?.transaction.amount,
+          });
+          toast.success(
+            data?.transaction?.sender_name +
+              " just credited your account with " +
+              `₦${data?.transaction?.amount.toLocaleString()}`
+          );
+        }
+
+        if (evt === "card_payment_successful") {
+          //  setShowToast(data);
+          console.log("Money received", {
+            data,
+            amount: data?.transaction.amount,
+          });
+          toast.success(
+            "Credit Alert - Payverge platform via card: " +
+              `₦${data?.transaction?.amount.toLocaleString()}`
+          );
+        }
       }
-    };
-  }
+      // you are the sender
+      if (
+        data?.transaction?.sender_id === user?.user?.userId &&
+        data?.transaction?.payment_id
+      ) {
+        if (evt === "card_payment_successful") {
+          //  setShowToast(data);
+          console.log("Your card was used on a payment platform", {
+            data,
+            amount: data?.transaction.amount,
+          });
+          toast.success(
+            "You just used your card to pay" +
+              `₦${data?.transaction?.amount.toLocaleString()}` +
+              " on payverge platform"
+          );
+        }
+        if (evt === "card_payment_failed") {
+          //  setShowToast(data);
+          console.log("Your card was used on a payment platform", {
+            data,
+            amount: data?.transaction.amount,
+          });
+          toast.success(
+            "Failed - You tried used your card to pay" +
+              `₦${data?.transaction?.amount.toLocaleString()}` +
+              " on payverge platform"
+          );
+        }
+      }
+    }
 
     // websocket.onclose = () => {
     //   console.log("Disconnected ❌");
