@@ -27,7 +27,7 @@ export const MainContextProvider = ({children}) => {
             })
 
             const data = await response.data;
-            console.log(data)
+            // console.log(data)
             setUser(data)
 
         } catch (error) {

@@ -4,6 +4,7 @@ import { useMainContext } from "@/context/MainContext";
 import { axiosClient } from "@/utils/AxiosClient";
 
 import { Formik, Form, ErrorMessage, Field } from "formik";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -11,6 +12,7 @@ import * as yup from "yup";
 const accountTypes = ["Savings", "Current"];
 const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
   const {fetchUserProfile} = useMainContext()
   const initialValues = {
     name: "",
@@ -53,19 +55,26 @@ const RegisterPage = () => {
       const data = response.data;
       //token
       localStorage.setItem("token", data.token);
-      const createAccount = await axiosClient.post("/account/create", defaultAccountDetails, {
-        headers: {
-        'Authorization': `Bearer ${data.token}`,
-        'Content-Type': 'application/json' // Often good practice for POST requests
+
+      let createAccount ;
+      if (data?.token) {
+        createAccount = await axiosClient.post("/account/create", defaultAccountDetails, {
+          headers: {
+            'Authorization': `Bearer ${data.token}`,
+            'Content-Type': 'application/json' // Often good practice for POST requests
+          }
+        });
+
+        if (!createAccount?.data?.account) {
+          toast.error("Error occurred while creating your account")
+          return;
+        }
       }
-      });
-      if (!createAccount?.account) {
-        toast.error("Error occurred while creating your account")
-        return;
-      }
+
       toast.success("Account created Successfully");
       await fetchUserProfile()
       helpers.resetForm();
+      router.push("/")
 
     } catch (error) {
       toast.error(error.response.data.msg);
