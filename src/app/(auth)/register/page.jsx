@@ -18,7 +18,17 @@ const RegisterPage = () => {
     password: "",
     acc_type: "",
   };
-
+  const defaultAccountDetails = {
+     address: "Lagos",
+    birth_date: "01/03/2003",
+    bvn: "12345678901",
+    docs_upload: [{
+        "fileName": "yebbaaa",
+        "filePath": "yebaaa",
+         "docType": "pdf",
+         "fileType": "NIN"
+    }]
+  }
   const validationSchema = yup.object({
     name: yup.string().required("Name is required"),
     email: yup
@@ -35,16 +45,26 @@ const RegisterPage = () => {
       .required("Account Type is required"),
   });
 
+ 
   const onSubmitHandler = async (values, helpers) => {
     setLoading(true)
     try {
       const response = await axiosClient.post("/auth/register", values);
       const data = response.data;
-      toast.success(data.msg);
       //token
       localStorage.setItem("token", data.token);
+      const createAccount = await axiosClient.post("/account/create", defaultAccountDetails, {
+        headers: {
+        'Authorization': `Bearer ${data.token}`,
+        'Content-Type': 'application/json' // Often good practice for POST requests
+      }
+      });
+      if (!createAccount?.account) {
+        toast.error("Error occurred while creating your account")
+        return;
+      }
+      toast.success("Account created Successfully");
       await fetchUserProfile()
-
       helpers.resetForm();
 
     } catch (error) {
