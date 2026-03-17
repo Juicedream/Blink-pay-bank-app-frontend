@@ -2,20 +2,59 @@
 import { CameraIcon, Loader, PlusCircle, QrCode } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import QrScanner from "qr-scanner";
+import { useMainContext } from "@/context/MainContext";
+import { toast } from "react-toastify";
 
 const page = () => {
+  const { user } = useMainContext();
   const videoEl = useRef(null);
   const qrScannerRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [scannedResult, setScannedResult] = useState("");
   const [showScanner, setShowScanner] = useState(false);
-
+  const [receiverAcc, setReceiverAcc] = useState("");
+  const [amount, setAmount] = useState(0);
+  const token = localStorage.getItem("token");
+  let transferBody = {
+    receiver_acc_number: receiverAcc,
+    sender_pin: user?.user?.pin,
+    amount: amount,
+    narration: "Qr Code Payment",
+  };
+ 
   const stopScanner = () => {
     qrScannerRef.current?.stop();
     qrScannerRef.current?.destroy();
     qrScannerRef.current = null;
     setShowScanner(false);
   };
+
+  async function transfer() {
+    setLoading(true);
+    try {
+      const response = await axiosClient.post(
+        "/account/single-transfer",
+        transferBody,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      const data = response.data;
+      toast.success(data.msg);
+      setAmount(0);
+      setReceiverAcc(0);
+      setLoading(false);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      toast.error(error.response.data.msg);
+    }
+  }
 
   const scanQr = () => {
     if (!videoEl.current) return;
@@ -25,8 +64,14 @@ const page = () => {
       (result) => {
         setScannedResult(result.data);
         console.log("decoded qr code:", result.data);
-        setLoading(true);
         stopScanner(); // hide video + highlights immediately
+        setLoading(true);
+        const amnt = Number(result.data.split("+")[0]);
+        setAmount(amnt);
+        const reciever = Number(result.data.split("+")[2]);
+        setReceiverAcc(receiverAcc)
+        toast.info(`Transfering ₦${amnt}...`);
+        transfer();
       },
       {
         returnDetailedScanResult: true,
@@ -48,6 +93,8 @@ const page = () => {
       scanQr();
     }
   };
+
+  const handlePayment = () => {};
 
   useEffect(() => {
     return () => stopScanner(); // cleanup on unmount
