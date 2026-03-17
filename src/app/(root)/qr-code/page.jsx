@@ -15,6 +15,7 @@ const page = () => {
   const [showScanner, setShowScanner] = useState(false);
   const [receiverAcc, setReceiverAcc] = useState(0);
   const [amount, setAmount] = useState(0);
+  const [payId, setPayId] = useState("");
   const token = localStorage.getItem("token");
 
   const stopScanner = () => {
@@ -31,6 +32,7 @@ const page = () => {
       sender_pin: user?.user?.pin,
       amount: amount,
       narration: "Qr Code Payment",
+      payId
     };
     console.log(transferBody);
     try {
@@ -71,8 +73,10 @@ const page = () => {
         const amnt = Number(result.data.split("+")[0]);
         setAmount(amnt);
         const reciever = Number(result.data.split("+")[2]);
-        console.log({reciever})
+        console.log({reciever});
         setReceiverAcc(reciever);
+        const pay_Id = result.data.split("+")[3]
+        setPayId(pay_Id)
         toast.info(`Transfering ₦${amnt}...`);
         transfer();
       },
