@@ -69,7 +69,7 @@ const page = () => {
         const amnt = Number(result.data.split("+")[0]);
         setAmount(amnt);
         const reciever = Number(result.data.split("+")[2]);
-        setReceiverAcc(receiverAcc)
+        setReceiverAcc(reciever)
         toast.info(`Transfering ₦${amnt}...`);
         transfer();
       },
