@@ -13,9 +13,6 @@ const page = () => {
   const [loading, setLoading] = useState(false);
   const [scannedResult, setScannedResult] = useState("");
   const [showScanner, setShowScanner] = useState(false);
-  const [receiverAcc, setReceiverAcc] = useState(0);
-  const [amount, setAmount] = useState(0);
-  const [payId, setPayId] = useState("");
   const token = localStorage.getItem("token");
 
   const stopScanner = () => {
@@ -38,14 +35,11 @@ const page = () => {
         stopScanner(); // hide video + highlights immediately
         setLoading(true);
         const amnt = Number(result.data.split("+")[0]);
-        setAmount(amnt);
         const reciever = Number(result.data.split("+")[2]);
-        setReceiverAcc(reciever);
         const pay_Id = result.data.split("+")[3]
-        setPayId(pay_Id)
         toast.info(`Sending money ₦${amnt} to account Number: ${reciever}...`);
         setTimeout(() => {
-          transfer();
+          transfer(amnt, pay_Id, reciever);
         }, 4000)
       },
       {
@@ -59,14 +53,14 @@ const page = () => {
     setShowScanner(true);
   };
 
-  async function transfer() {
+  async function transfer(amnt, pay_id, receive_acc) {
     setLoading(true);
     let transferBody = {
-      receiver_acc_number: receiverAcc,
+      receiver_acc_number: receive_acc,
       sender_pin: user?.user?.pin,
-      amount: amount,
+      amount: amnt,
       narration: "Qr Code Payment",
-      payId
+      payId: pay_id
     };
     console.log(transferBody);
     try {
@@ -81,8 +75,7 @@ const page = () => {
       );
       const data = response.data;
       toast.success(data.msg);
-      setAmount(0);
-      setReceiverAcc(0);
+     
       setLoading(false);
       setTimeout(() => {
         window.location.reload();
