@@ -122,7 +122,7 @@ const page = () => {
         </button>
       </div>
 
-      <p>Scanned result: {scannedResult}</p>
+      {/* <p>Scanned result: {scannedResult}</p> */}
 
       {loading && (
         <p className="animate-spin">
