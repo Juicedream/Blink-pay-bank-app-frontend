@@ -25,6 +25,40 @@ const page = () => {
     setShowScanner(false);
   };
 
+  
+
+  const scanQr = () => {
+    if (!videoEl.current) return;
+
+    qrScannerRef.current = new QrScanner(
+      videoEl.current,
+      (result) => {
+        setScannedResult(result.data);
+        console.log("decoded qr code:", result.data);
+        stopScanner(); // hide video + highlights immediately
+        setLoading(true);
+        const amnt = Number(result.data.split("+")[0]);
+        setAmount(amnt);
+        const reciever = Number(result.data.split("+")[2]);
+        setReceiverAcc(reciever);
+        const pay_Id = result.data.split("+")[3]
+        setPayId(pay_Id)
+        toast.info(`Sending money ₦${amnt} to account Number: ${reciever}...`);
+        setTimeout(() => {
+          transfer();
+        }, 4000)
+      },
+      {
+        returnDetailedScanResult: true,
+        highlightScanRegion: true,
+        highlightCodeOutline: true,
+      },
+    );
+
+    qrScannerRef.current.start();
+    setShowScanner(true);
+  };
+
   async function transfer() {
     setLoading(true);
     let transferBody = {
@@ -59,38 +93,6 @@ const page = () => {
       toast.error(error.response.data.msg);
     }
   }
-
-  const scanQr = () => {
-    if (!videoEl.current) return;
-
-    qrScannerRef.current = new QrScanner(
-      videoEl.current,
-      (result) => {
-        setScannedResult(result.data);
-        console.log("decoded qr code:", result.data);
-        stopScanner(); // hide video + highlights immediately
-        setLoading(true);
-        const amnt = Number(result.data.split("+")[0]);
-        setAmount(amnt);
-        const reciever = Number(result.data.split("+")[2]);
-        setReceiverAcc(reciever);
-        const pay_Id = result.data.split("+")[3]
-        setPayId(pay_Id)
-        toast.info(`Sending money ₦${amnt} to account Number: ${reciever}...`);
-        setTimeout(() => {
-          transfer();
-        }, 4000)
-      },
-      {
-        returnDetailedScanResult: true,
-        highlightScanRegion: true,
-        highlightCodeOutline: true,
-      },
-    );
-
-    qrScannerRef.current.start();
-    setShowScanner(true);
-  };
 
   const handleQrScaningImage = () => {
     QrScanner.listCameras(true);
