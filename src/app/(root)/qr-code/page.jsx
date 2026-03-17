@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import QrScanner from "qr-scanner";
 import { useMainContext } from "@/context/MainContext";
 import { toast } from "react-toastify";
+import { axiosClient } from "@/utils/AxiosClient";
 
 const page = () => {
   const { user } = useMainContext();
@@ -12,16 +13,10 @@ const page = () => {
   const [loading, setLoading] = useState(false);
   const [scannedResult, setScannedResult] = useState("");
   const [showScanner, setShowScanner] = useState(false);
-  const [receiverAcc, setReceiverAcc] = useState("");
+  const [receiverAcc, setReceiverAcc] = useState(0);
   const [amount, setAmount] = useState(0);
   const token = localStorage.getItem("token");
-  let transferBody = {
-    receiver_acc_number: receiverAcc,
-    sender_pin: user?.user?.pin,
-    amount: amount,
-    narration: "Qr Code Payment",
-  };
- 
+
   const stopScanner = () => {
     qrScannerRef.current?.stop();
     qrScannerRef.current?.destroy();
@@ -31,6 +26,13 @@ const page = () => {
 
   async function transfer() {
     setLoading(true);
+    let transferBody = {
+      receiver_acc_number: String(receiverAcc),
+      sender_pin: user?.user?.pin,
+      amount: amount,
+      narration: "Qr Code Payment",
+    };
+    console.log(transferBody);
     try {
       const response = await axiosClient.post(
         "/account/single-transfer",
@@ -69,7 +71,8 @@ const page = () => {
         const amnt = Number(result.data.split("+")[0]);
         setAmount(amnt);
         const reciever = Number(result.data.split("+")[2]);
-        setReceiverAcc(reciever)
+        console.log({reciever})
+        setReceiverAcc(reciever);
         toast.info(`Transfering ₦${amnt}...`);
         transfer();
       },
@@ -99,6 +102,94 @@ const page = () => {
   useEffect(() => {
     return () => stopScanner(); // cleanup on unmount
   }, []);
+
+   useEffect(() => {
+      const websocket = new WebSocket(
+        "wss://blink-pay-bank-app-backend.onrender.com"
+      );
+  
+      websocket.onopen = () => {
+        console.log("WebSocket connection established");
+      };
+  
+      websocket.onmessage = (event) => {
+        const { event: evt, data } = JSON.parse(event.data);
+        // your are the receiver
+        if(data?.transaction?.receiver_id === user?.user?.userId){
+        if (evt === "money_received") {
+          //  setShowToast(data);
+          console.log("Money received", {
+            data,
+            amount: data?.transaction.amount,
+          });
+          toast.success(data?.transaction?.sender_name + " just credited your account with " + `₦${data?.transaction?.amount.toLocaleString()}`);
+        }
+
+        if(evt === "card_payment_successful"){
+          //  setShowToast(data);
+          console.log("Money received", {
+            data,
+            amount: data?.transaction.amount,
+          });
+          toast.success(
+            "Credit Alert - Payverge platform via card: " +
+              `₦${data?.transaction?.amount.toLocaleString()}`
+          );
+        }
+        }
+        // you are the sender
+         if (
+           data?.transaction?.sender_id === user?.user?.userId &&
+           data?.transaction?.payment_id
+         ) {
+           if (evt === "card_payment_successful") {
+             //  setShowToast(data);
+             console.log("Your card was used on a payment platform", {
+               data,
+               amount: data?.transaction.amount,
+             });
+             toast.success(
+               "You just used your card to pay" +
+                 `₦${data?.transaction?.amount.toLocaleString()}` +
+                 " on payverge platform"
+             );
+           }
+           if (evt === "card_payment_failed") {
+             //  setShowToast(data);
+             console.log("Your card was used on a payment platform", {
+               data,
+               amount: data?.transaction.amount,
+             });
+             toast.success(
+               "Failed - You tried used your card to pay" +
+                 `₦${data?.transaction?.amount.toLocaleString()}` +
+                 " on payverge platform"
+             );
+           }
+         };
+
+
+
+    }
+  
+      // websocket.onclose = () => {
+      //   console.log("Disconnected ❌");
+      // };
+  
+      // websocket.onerror = (error) => {
+      //   console.error("WebSocket error:", error);
+      // };
+  
+      // ✅ cleanup so double-mount won’t leave ghost sockets
+      return () => {
+      if (websocket) {
+        console.log("🔒 Closing WebSocket safely...");
+        websocket.close();
+      }
+      
+        
+    };
+    }, [])
 
   return (
     <div className="h-full flex flex-col gap-2 items-center mt-4">
