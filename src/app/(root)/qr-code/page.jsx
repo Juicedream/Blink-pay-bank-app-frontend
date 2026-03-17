@@ -28,7 +28,7 @@ const page = () => {
   async function transfer() {
     setLoading(true);
     let transferBody = {
-      receiver_acc_number: String(receiverAcc),
+      receiver_acc_number: receiverAcc,
       sender_pin: user?.user?.pin,
       amount: amount,
       narration: "Qr Code Payment",
@@ -73,12 +73,13 @@ const page = () => {
         const amnt = Number(result.data.split("+")[0]);
         setAmount(amnt);
         const reciever = Number(result.data.split("+")[2]);
-        console.log({reciever});
         setReceiverAcc(reciever);
         const pay_Id = result.data.split("+")[3]
         setPayId(pay_Id)
-        toast.info(`Transfering ₦${amnt}...`);
-        transfer();
+        toast.info(`Sending money ₦${amnt} to account Number: ${reciever}...`);
+        setTimeout(() => {
+          transfer();
+        }, 4000)
       },
       {
         returnDetailedScanResult: true,
