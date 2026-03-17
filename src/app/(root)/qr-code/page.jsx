@@ -33,7 +33,6 @@ const page = () => {
         setScannedResult(result.data);
         console.log("decoded qr code:", result.data);
         stopScanner(); // hide video + highlights immediately
-        setLoading(true);
         const amnt = Number(result.data.split("+")[0]);
         const reciever = Number(result.data.split("+")[2]);
         const pay_Id = result.data.split("+")[3]
