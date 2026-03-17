@@ -1,24 +1,99 @@
-import { CameraIcon, PlusCircle, QrCode } from 'lucide-react'
-import React from 'react'
+"use client";
+import { CameraIcon, Loader, PlusCircle, QrCode } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import QrScanner from "qr-scanner";
 
 const page = () => {
-  return (
-    <div className='h-full flex flex-col gap-2 items-center mt-4'>
-        <div className='flex flex-row sm:flex-col md:flex-col w-full justify-between px-16'>
-            <button className='ring-1 p-4 rounded-2xl flex gap-4 hover:cursor-pointer hover:shadow-lg hover:shadow-black hover:-translate-y-0.5 hover:bg-purple-600 hover:text-white hover:ring-0'>
-                <QrCode />
-                Generate QR Code
-                <PlusCircle />
-            </button>
-            <button className='ring-1 p-4 rounded-2xl flex gap-4 hover:cursor-pointer hover:shadow-lg hover:shadow-black hover:-translate-y-0.5 hover:bg-purple-600 hover:text-white hover:ring-0'>
-                <CameraIcon />
-                Scan QR Code
-                <QrCode />
-            </button>
-            
-        </div>
-    </div>
-  )
-}
+  const videoEl = useRef(null);
+  const qrScannerRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const [scannedResult, setScannedResult] = useState("");
+  const [showScanner, setShowScanner] = useState(false);
 
-export default page
+  const stopScanner = () => {
+    qrScannerRef.current?.stop();
+    qrScannerRef.current?.destroy();
+    qrScannerRef.current = null;
+    setShowScanner(false);
+  };
+
+  const scanQr = () => {
+    if (!videoEl.current) return;
+
+    qrScannerRef.current = new QrScanner(
+      videoEl.current,
+      (result) => {
+        setScannedResult(result.data);
+        console.log("decoded qr code:", result.data);
+        setLoading(true);
+        stopScanner(); // hide video + highlights immediately
+      },
+      {
+        returnDetailedScanResult: true,
+        highlightScanRegion: true,
+        highlightCodeOutline: true,
+      },
+    );
+
+    qrScannerRef.current.start();
+    setShowScanner(true);
+  };
+
+  const handleQrScaningImage = () => {
+    QrScanner.listCameras(true);
+
+    if (showScanner) {
+      stopScanner(); // toggle off if already scanning
+    } else {
+      scanQr();
+    }
+  };
+
+  useEffect(() => {
+    return () => stopScanner(); // cleanup on unmount
+  }, []);
+
+  return (
+    <div className="h-full flex flex-col gap-2 items-center mt-4">
+      <div className="flex lg:flex-row flex-col w-full justify-between lg:px-16 gap-8">
+        <button
+          className="ring-1 p-4 rounded-2xl flex justify-between hover:cursor-pointer 
+            lg:gap-4 hover:shadow-lg hover:shadow-black hover:-translate-y-0.5 hover:bg-purple-600 hover:text-white hover:ring-0"
+        >
+          <QrCode />
+          Generate QR Code
+          <PlusCircle />
+        </button>
+        <button
+          onClick={handleQrScaningImage}
+          className="ring-1 p-4 rounded-2xl flex justify-between hover:cursor-pointer hover:shadow-lg hover:shadow-black
+            lg:gap-4 hover:-translate-y-0.5 hover:bg-purple-600 hover:text-white hover:ring-0"
+        >
+          <QrCode />
+          Scan QR Code
+          <CameraIcon />
+        </button>
+      </div>
+
+      <p>Scanned result: {scannedResult}</p>
+
+      {loading && (
+        <p className="animate-spin">
+          <Loader size={32} />
+        </p>
+      )}
+
+      {/* Video only renders in the DOM when scanning */}
+      <video
+        ref={videoEl}
+        style={{
+          width: "100%",
+          maxWidth: "400px",
+          display: showScanner ? "block" : "none",
+        }}
+      />
+    </div>
+  );
+};
+
+export default page;
