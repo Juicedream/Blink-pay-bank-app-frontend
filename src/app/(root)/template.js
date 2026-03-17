@@ -13,6 +13,7 @@ import { GrCurrency } from "react-icons/gr";
 import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { RiHistoryFill } from "react-icons/ri";
 import { BsCreditCardFill } from "react-icons/bs";
+import { QrCode } from "lucide-react";
 
 
 const RootTemplate = ({ children }) => {
@@ -61,7 +62,7 @@ const RootTemplate = ({ children }) => {
         toggled={isToggle}
         onBackdropClick={() => dispatch(setIsToggle)}
       >
-        <Menu className="!bg-white !min-h-screen lg:!min-h-[90vh] px-3 py-10">
+        <Menu className="bg-white! min-h-screen! lg:min-h-[90vh]! px-3 py-10">
           <CustomMenu link="/" text="Home" Icon={MdDashboard} />
           {/* <CustomMenu link="/amount" text="Amount" Icon={GrCurrency} /> */}
           <CustomMenu
@@ -78,6 +79,11 @@ const RootTemplate = ({ children }) => {
             link="/card"
             text="Card"
             Icon={BsCreditCardFill}
+          />
+          <CustomMenu
+            link="/qr-code"
+            text="QR Code"
+            Icon={QrCode}
           />
           <CustomMenu link="/profile" text="Profile" Icon={GiFalloutShelter} />
         </Menu>
