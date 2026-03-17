@@ -4,6 +4,7 @@ import { useMainContext } from "@/context/MainContext";
 
 const TransactionHistory = () => {
     const {user} = useMainContext()
+    if (!user) return;
   return (
     <>
       <div className="flex items-center ml-4 my-4">

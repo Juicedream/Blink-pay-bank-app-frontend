@@ -22,6 +22,7 @@ const RootTemplate = ({ children }) => {
   const router = useRouter();
   const isToggle = useSelector(SidebarSlicePath)
   const dispatch = useDispatch()
+ 
   useEffect(() => {
     if (!user) {
       router.push("/login");
@@ -29,6 +30,7 @@ const RootTemplate = ({ children }) => {
       setLoading(false);
     }
   }, []);
+  if (!user) return;
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">

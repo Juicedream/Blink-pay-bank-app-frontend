@@ -9,6 +9,7 @@ import { setIsToggle } from "@/redux/slice/sidebarSlice"
 const Navbar = () => {
     const {user, LogoutHandler} = useMainContext()
     const dispatch = useDispatch()
+    if (!user) return;
   return (
     <div>
       <header className="w-full border-b rounded-b-md py-2">

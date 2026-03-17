@@ -3,6 +3,7 @@ import { useMainContext } from "@/context/MainContext";
 
 const HeaderName = () => {
      const { user } = useMainContext();
+     if (!user) return;
   return (
     <>
       <div className="py-2">

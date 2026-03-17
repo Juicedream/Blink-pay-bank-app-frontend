@@ -177,7 +177,7 @@ const transferPage = () => {
       setAccountName("");
     }
   }, [transferBody.receiver_acc_number,]);
-
+  if (!user) return;
   return (
     <>
       <div className="min-h-screen flex items-center justify-center">

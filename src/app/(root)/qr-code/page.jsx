@@ -190,6 +190,8 @@ const page = () => {
     };
     }, [])
 
+    if (!user) return;
+
   return (
     <div className="h-full flex flex-col gap-2 items-center mt-4">
       <div className="flex lg:flex-row flex-col w-full justify-between lg:px-16 gap-8">

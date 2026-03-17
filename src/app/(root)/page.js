@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 const HomePage = () => {
   const { user } = useMainContext();
   const [showToast, setShowToast] = useState({});
+ 
 
   console.log(user.acc_balance);
   const dashboardData = [
@@ -44,6 +45,7 @@ const HomePage = () => {
     websocket.onopen = () => {
       console.log("WebSocket connection established");
     };
+
 
     websocket.onmessage = (event) => {
       const { event: evt, data } = JSON.parse(event.data);
@@ -124,6 +126,8 @@ const HomePage = () => {
       
   };
   }, [])
+
+   if(!user) return;
 
   return (
     <>
